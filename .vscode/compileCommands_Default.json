@@ -1,0 +1,26 @@
+[
+	{
+		"file": "E:\\Projects\\Personal\\Ue5\\ThirdPersonShooter\\Source\\ThirdPersonShooter\\ThirdPersonShooter.Build.cs",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\Projects\\Personal\\Ue5\\ThirdPersonShooter\\.vscode\\compileCommands_Default\\ThirdPersonShooter.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.5\\Engine\\Source"
+	},
+	{
+		"file": "E:\\Projects\\Personal\\Ue5\\ThirdPersonShooter\\Source\\ThirdPersonShooter\\ThirdPersonShooter.cpp",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\Projects\\Personal\\Ue5\\ThirdPersonShooter\\.vscode\\compileCommands_Default\\ThirdPersonShooter.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.5\\Engine\\Source"
+	},
+	{
+		"file": "E:\\Projects\\Personal\\Ue5\\ThirdPersonShooter\\Source\\ThirdPersonShooter\\ThirdPersonShooter.h",
+		"arguments": [
+			"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\Hostx64\\x64\\cl.exe",
+			"@E:\\Projects\\Personal\\Ue5\\ThirdPersonShooter\\.vscode\\compileCommands_Default\\ThirdPersonShooter.1.rsp"
+		],
+		"directory": "C:\\Program Files\\Epic Games\\UE_5.5\\Engine\\Source"
+	}
+]
