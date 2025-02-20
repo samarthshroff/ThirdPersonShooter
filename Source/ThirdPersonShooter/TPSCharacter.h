@@ -59,6 +59,7 @@ class THIRDPERSONSHOOTER_API ATPSCharacter : public ACharacter
 	void OnCharacterIdle();
 
 	bool bIsIdle;
+	UAnimInstance* AnimInstance;
 public:
 	// Sets default values for this character's properties
 	ATPSCharacter();

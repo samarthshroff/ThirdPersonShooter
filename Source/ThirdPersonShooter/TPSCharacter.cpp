@@ -72,6 +72,8 @@ void ATPSCharacter::BeginPlay()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
+
+	AnimInstance = GetMesh()->GetAnimInstance();
 	
 }
 
@@ -80,8 +82,11 @@ void ATPSCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	UAnimInstance* AnimInstance = 
-
+	if (AnimInstance)
+	{
+		FName Name = AnimInstance->GetCurrentStateName(0);
+		UE_LOG(LogTemp, Warning, TEXT("current state:%s"), *(Name.ToString()));
+	}
 	// if (bIsIdle && WeaponActor != nullptr)
 	// {
 	// 	WeaponActor->GetSkeletalMesh()->SetRelativeTransform()
