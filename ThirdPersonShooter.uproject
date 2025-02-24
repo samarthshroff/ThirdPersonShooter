@@ -11,6 +11,11 @@
 			"AdditionalDependencies": [
 				"Engine"
 			]
+		},
+		{
+			"Name":"ThirdPersonShooterEditor",
+			"Type": "Editor",
+			"LoadingPhase": "Default"
 		}
 	],
 	"Plugins": [
