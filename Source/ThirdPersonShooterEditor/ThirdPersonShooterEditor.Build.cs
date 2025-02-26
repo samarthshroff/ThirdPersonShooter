@@ -17,10 +17,13 @@ public class ThirdPersonShooterEditor : ModuleRules
 			                                     "Engine", 
 			                                     "EditorFramework", 
 			                                     "UnrealEd", 
-			                                     "GameplayTagsEditor", 
+			                                     "GameplayTagsEditor",
+			                                     "GameplayTags",
 			                                     "InputCore",
 			                                     "Slate",
 			                                     "SlateCore",
+			                                     "PythonScriptPlugin",
+			                                     "PythonScriptPluginPreload",
 			                                     "ThirdPersonShooter"
 		                                     });
 
@@ -33,7 +36,10 @@ public class ThirdPersonShooterEditor : ModuleRules
 		                                                    "MessageLog",
 		                                                    "Projects",
 		                                                    "DeveloperToolSettings",
-		                                                    "CollectionManager" });
+		                                                    "CollectionManager", 
+		                                                    "PythonScriptPlugin",
+		                                                    "PythonScriptPluginPreload"
+		                                                   });
 
 		// Uncomment if you are using online features
 		// PrivateDependencyModuleNames.Add("OnlineSubsystem");

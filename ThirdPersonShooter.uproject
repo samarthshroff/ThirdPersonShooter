@@ -13,9 +13,12 @@
 			]
 		},
 		{
-			"Name":"ThirdPersonShooterEditor",
+			"Name": "ThirdPersonShooterEditor",
 			"Type": "Editor",
-			"LoadingPhase": "Default"
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"CoreUObject"
+			]
 		}
 	],
 	"Plugins": [
