@@ -2,16 +2,20 @@
 
 #pragma once
 
+
 #include "CoreMinimal.h"
 #include "InputAction.h"
+#include "WeaponDataRetriever.h"
+#include "WeaponMetaData.h"
 #include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "TPSCharacter.generated.h"
 
 class AWeaponActor;
 struct FInputActionValue;
 class UInputAction;
 class UInputMappingContext;
-class USpringArmComponent;
 class UCameraComponent;
 
 UCLASS()
@@ -20,46 +24,53 @@ class THIRDPERSONSHOOTER_API ATPSCharacter : public ACharacter
 	GENERATED_BODY()
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	UCameraComponent* ThirdPersonCameraComponent;
+	TObjectPtr<UCameraComponent> ThirdPersonCameraComponent;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	USpringArmComponent* SpringArmComponent;
+	TObjectPtr<USpringArmComponent> SpringArmComponent;
 
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
-	UInputMappingContext* DefaultMappingContext;
+	TObjectPtr<UInputMappingContext> DefaultMappingContext;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
-	UInputAction* JumpAction;
+	TObjectPtr<UInputAction> JumpAction;
 
 	/** Move Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
-	UInputAction* MoveAction;
+	TObjectPtr<UInputAction> MoveAction;
 
 	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputAction* LookAction;
+	TObjectPtr<UInputAction> LookAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputAction* FireAction;
+	TObjectPtr<UInputAction> FireAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInputAction> WeaponChangeAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	bool JumpButtonDown;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon, meta = (AllowPrivateAccess = "true"))
-	USkeletalMesh* DefaultWeaponMesh;
+	TArray<FGameplayTag> PossessedWeaponsTags;
+		
+	UPROPERTY(VisibleInstanceOnly, Category=Weapon, meta=(AllowPrivateAccess = "true"))
+	TObjectPtr<AWeaponActor> WeaponActor;
 
-	UPROPERTY(EditDefaultsOnly, Category=Weapon)
-	TSubclassOf<AWeaponActor> WeaponClass;
-
-	UPROPERTY(VisibleAnywhere, Category=Weapon, meta=(AllowPrivateAccess = "true"))
-	AWeaponActor* WeaponActor;
+	UPROPERTY()
+	TObjectPtr<UWeaponDataRetriever> WeaponDataRetriever;
 
 	UFUNCTION(BlueprintCallable, Category = CharacterState, meta = (AllowPrivateAccess = "true"))
 	void OnCharacterIdle();
 
 	bool bIsIdle;
-	UAnimInstance* AnimInstance;
+	
+	int WeaponInUseTagIndex;
+	TSharedPtr<UAnimInstance> AnimInstance;
+	TSharedPtr<UCharacterMovementComponent> MovementComponent;
+	
 public:
 	// Sets default values for this character's properties
 	ATPSCharacter();
@@ -72,7 +83,8 @@ protected:
 
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
-	void Fire(const FInputActionInstance& InputActionInstance);	
+	void Fire(const FInputActionInstance& InputActionInstance);
+	void ChangeWeapon(const FInputActionValue& InputActionInstance);
 
 	void Jump() override;
 	void StopJumping() override;

@@ -7,11 +7,14 @@
 #include "Components/CapsuleComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "NativeGameplayTags.h"
+#include "ProjectileEmitterWeapon.h"
+#include "ProjectileWeapon.h"
+#include "TPSGamePlayTags.h"
 #include "TPSPlayerController.h"
 #include "WeaponActor.h"
-#include "GameFramework/CharacterMovementComponent.h"
-#include "GameFramework/SpringArmComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Logging/StructuredLog.h"
 
 // Sets default values
 ATPSCharacter::ATPSCharacter()
@@ -30,6 +33,12 @@ ATPSCharacter::ATPSCharacter()
 	
 	ThirdPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	ThirdPersonCameraComponent->SetupAttachment(SpringArmComponent);
+
+	// if (WeaponClass == nullptr)
+ //    {
+ //    	WeaponClass = AWeaponActor::StaticClass();
+ //    }
+	
 	// ThirdPersonCameraComponent->bUsePawnControlRotation = true;
 	//
 	// GetCharacterMovement()->bUseControllerDesiredRotation = true;
@@ -42,26 +51,47 @@ ATPSCharacter::ATPSCharacter()
 void ATPSCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	WeaponInUseTagIndex = PossessedWeaponsTags.Num()-1;
+	
+	WeaponDataRetriever = NewObject<UWeaponDataRetriever>();
+	
 	SpringArmComponent->TargetArmLength = 200.0f;
 	SpringArmComponent->SocketOffset = FVector(0.0f, 50.0f, 73.0f);
 	SpringArmComponent->ProbeSize = 12.0f;
 	SpringArmComponent->bUsePawnControlRotation = true;
-
+	
 	ThirdPersonCameraComponent->bUsePawnControlRotation = true;
 	
-	GetCharacterMovement()->bUseControllerDesiredRotation = true;
-	GetCharacterMovement()->bOrientRotationToMovement = false;
+	MovementComponent = MakeShareable(GetCharacterMovement());
+	MovementComponent->bUseControllerDesiredRotation = true;
+	MovementComponent->bOrientRotationToMovement = false;
 
+	// So that character can strafe.
 	bUseControllerRotationYaw = false;
-	
-	if (WeaponClass)
+
+	if (WeaponDataRetriever != nullptr)
 	{
-		WeaponActor = GetWorld()->SpawnActor<AWeaponActor>(WeaponClass);
-		WeaponActor->AttachToComponent(GetMesh(),FAttachmentTransformRules::KeepRelativeTransform, "WeaponSocket");
-	}	
-	if (WeaponActor != nullptr && DefaultWeaponMesh != nullptr)
-	{
-		WeaponActor->SetSkeletalMesh(DefaultWeaponMesh);
+		FWeaponMetaData* WeaponData = WeaponDataRetriever->GetWeaponData(PossessedWeaponsTags[WeaponInUseTagIndex].GetTagName());
+		
+		if (WeaponData->WeaponType == TPSGameplayTags::WeaponType_ProjectileEmitter)
+		{
+			WeaponActor = GetWorld()->SpawnActor<AProjectileEmitterWeapon>(AProjectileEmitterWeapon::StaticClass());
+		}
+		if (WeaponData->WeaponType == TPSGameplayTags::WeaponType_Projectile)
+		{
+			WeaponActor = GetWorld()->SpawnActor<AProjectileWeapon>(AProjectileWeapon::StaticClass());
+		}
+		if (WeaponActor)
+		{
+			UE_LOGFMT(LogTemp, Log, "WeaponActor {0}, {1}", WeaponActor->GetName(), WeaponActor->GetFullName());
+			WeaponActor->AttachToComponent(GetMesh(),FAttachmentTransformRules::KeepRelativeTransform, "WeaponSocket");
+			WeaponActor->UpdateMesh(&(WeaponData->Mesh));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("Could not create WeaponActor of type %s"), *(WeaponData->WeaponType.ToString()));
+		}
 	}	
 
 	if (ATPSPlayerController* PlayerController = Cast<ATPSPlayerController>(Controller))
@@ -73,8 +103,7 @@ void ATPSCharacter::BeginPlay()
 		}
 	}
 
-	AnimInstance = GetMesh()->GetAnimInstance();
-	
+	AnimInstance = MakeShareable(GetMesh()->GetAnimInstance());	
 }
 
 //Called every frame
@@ -82,15 +111,17 @@ void ATPSCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (AnimInstance)
+	if (AnimInstance && MovementComponent)
 	{
 		FName Name = AnimInstance->GetCurrentStateName(0);
-		UE_LOG(LogTemp, Warning, TEXT("current state:%s"), *(Name.ToString()));
+		//On Idle mouse rotation rotates the camera to character's front.
+		// when not idle mouse rotation moves the character to look in that direction. 
+		MovementComponent->bOrientRotationToMovement = Name.Compare("Idle") == 0;
+		// if (WeaponActor != nullptr)
+		// {
+		// 	WeaponActor->GetSkeletalMesh()->SetRelativeTransform()
+		// }
 	}
-	// if (bIsIdle && WeaponActor != nullptr)
-	// {
-	// 	WeaponActor->GetSkeletalMesh()->SetRelativeTransform()
-	// }
 }
 
 // Called to bind functionality to input
@@ -104,7 +135,16 @@ void ATPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ATPSCharacter::Move);
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ATPSCharacter::Look);
 		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &ATPSCharacter::Fire);
+
+		EnhancedInputComponent->BindAction(WeaponChangeAction, ETriggerEvent::Started, this, &ATPSCharacter::ChangeWeapon);
+		// EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &ATPSCharacter::Fire);
+		// EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &ATPSCharacter::Fire);
 	}
+}
+
+void ATPSCharacter::ChangeWeapon(const FInputActionValue& InputActionInstance)
+{
+	UE_LOG(LogTemp, Log, TEXT("The Action on weapon change: "));
 }
 
 void ATPSCharacter::Move(const FInputActionValue& Value)
@@ -137,6 +177,10 @@ void ATPSCharacter::Fire(const FInputActionInstance& InputActionInstance)
 	if (Controller == nullptr) return;
 
 	UE_LOG(LogTemp, Warning, TEXT("FIRE!"));
+	if (WeaponActor)
+	{
+		WeaponActor->Fire();
+	}
 }
 
 void ATPSCharacter::Jump()
