@@ -20,19 +20,7 @@ class WeaponGameplayTagUpdater:
         global weapon_tag_updater
         weapon_tag_updater = self
 
-    def create_menu(self):
-        menus = unreal.ToolMenus.get()
-
-        main_menu = menus.find_menu(unreal.Name("LevelEditor.MainMenu"))
-
-        menus.remove_menu(unreal.Name("LevelEditor.MainMenu.TpsTools"))
-        menus.remove_menu(unreal.Name("LevelEditor.MainMenu.MainMenu"))
-
-        tps_tool_menu = menus.find_menu(unreal.Name("LevelEditor.MainMenu.TpsTools"))
-        if tps_tool_menu is None:
-            unreal.log("TpsTool menu NOT found. Creating One.")
-            tps_tool_menu = main_menu.add_sub_menu(owner=unreal.Name("LevelEditor.MainMenu"), section_name="LevelEditor",name="TpsTools",label="TpsTools")
-
+    def create_menu_option(self, menus, tps_tool_menu):
             update_weapon_tags = unreal.ToolMenuEntry(
                 name="UpdateWeaponGameplayTags",
                 owner=unreal.ToolMenuOwner(unreal.Name("LevelEditor.MainMenu.TpsTools")),
@@ -46,19 +34,20 @@ class WeaponGameplayTagUpdater:
 
     # Adds names of all Skeletal Mesh and Static Mesh from the supplied directory and sub directories as game play tags to the ini files
     def update_tags(self):
+        # Ask for the directory that has all teh weapons' meshes.
         Tk().withdraw()
         content_dir_path = unreal.Paths.convert_relative_path_to_full(unreal.Paths.project_content_dir())
-        content_dir_path1 = unreal.Paths.convert_relative_path_to_full(unreal.Paths.project_content_dir())[:-9]
-
         directory = askdirectory(initialdir=content_dir_path, title="Select Weapon(s) Mesh Directory", mustexist=True)
         directory = directory.replace(content_dir_path, "/Game/")
 
+        # Read all asset entries
         asset_registry = unreal.AssetRegistryHelpers.get_asset_registry()
         # unreal.log(f"is registry loading: {asset_registry.is_loading_assets()}")
         # unreal.log(f"has assets {asset_registry.has_assets(package_path=unreal.Name(directory), recursive=True)}")
         assets = asset_registry.get_assets_by_path(package_path=unreal.Name(directory), recursive=True,include_only_on_disk_assets=True)
         unreal.log(f"Total assets found {len(assets)}")
 
+        # Get the directory path where ini's will be stored. If absent create one.
         ini_path = f"{unreal.Paths.project_dir()}Config/Tags"
         if os.path.isdir(ini_path):
             unreal.log("directory present. deleting ini files from the directory")
@@ -74,6 +63,7 @@ class WeaponGameplayTagUpdater:
             unreal.log("directory NOT present. Creating one.")
             os.makedirs(name=ini_path, mode=0o700, exist_ok=True)
 
+        # loop through the assets and write to the ini file based on the tags parent name and write the tags to the file.
         header = "[/Script/GameplayTags.GameplayTagsList]"
         for asset in assets:
             # SkeletalMesh, StaticMesh

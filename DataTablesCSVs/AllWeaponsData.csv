@@ -1,0 +1,4 @@
+---,NumberOfBulletsPerMag,DamageInPrecentage,DefaultPossessionValue,IntervalBetweenBulletsShot,CanActorPossesSecondWeapon,GripType,WeaponType,Projectile,Mesh
+SK_AR4_X,"60","20","300","0.200000","False","TWO_HANDED","(TagName=""Weapon.ProjectileEmitter"")","None","(Variant=SkeletalMesh,SkeletalMesh=""/Script/Engine.SkeletalMesh'/Game/FPS_Weapon_Bundle/Weapons/Meshes/Weapons/AR4/SK_AR4_X.SK_AR4_X'"",StaticMesh=None)"
+SK_G67_X,"0","100","5","0.000000","False","SINGLE_HANDED","(TagName=""Weapon.Projectile"")","None","(Variant=SkeletalMesh,SkeletalMesh=""/Script/Engine.SkeletalMesh'/Game/FPS_Weapon_Bundle/Weapons/Meshes/Weapons/G67_Grenade/SK_G67_X.SK_G67_X'"",StaticMesh=None)"
+SK_M9_Knife_X,"0","100","1","0.000000","False","SINGLE_HANDED","(TagName=""Weapon.Melee"")","None","(Variant=SkeletalMesh,SkeletalMesh=""/Script/Engine.SkeletalMesh'/Game/FPS_Weapon_Bundle/Weapons/Meshes/Weapons/M9_Knife/SK_M9_Knife_X.SK_M9_Knife_X'"",StaticMesh=None)"
